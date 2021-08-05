@@ -2,7 +2,7 @@
  * ApiListener Object.
 */
 
-object ApiListener "<hostnamectl Static hostname>" {
+object ApiListener "{{ ansible_hostname }}" {
   bind_port = 5665
   accept_config = true
   accept_commands = true

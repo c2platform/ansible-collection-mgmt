@@ -7,8 +7,8 @@ object Endpoint "dc1-r1-mon.dmgmt.bkwi.nl" {
   port = 5665
 }
 
-object Endpoint "<fqdn>" {
-  host = "<fqdn|ip address>"
+object Endpoint "{{ ansible_fqdn }}" {
+  host = "{{ ansible_default_ipv4.address }}"
   port = 5665
 }
 
