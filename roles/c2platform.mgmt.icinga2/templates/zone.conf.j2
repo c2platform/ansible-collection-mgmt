@@ -1,0 +1,21 @@
+/**
+ * Zone Objects.
+*/
+
+object Zone "director-global" {
+  global = true
+}
+
+object Zone "global-templates" {
+  global = true
+}
+
+object Zone "master" {
+  endpoints = ["dc1-r1-mon.dmgmt.bkwi.nl"]
+}
+
+object Zone "<fqdn>" {
+  endpoints = ["<fqdn>"]
+  parent = "master"
+}
+
