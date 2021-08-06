@@ -1,0 +1,8 @@
+
+- name: Install Icinga2
+  hosts: all
+  gather_facts: yes
+  become: yes
+
+  roles:
+    - role: ../roles/c2platform.mgmt.icinga2
