@@ -25,7 +25,7 @@ project_data_dir: /opt/awx
 #no_proxy=mycorp.org
 
 # from https://github.com/ansible/awx/blob/devel/installer/roles/local_docker/defaults/main.yml
-dockerhub_version: 16.0.0
+dockerhub_version: 17.0.1
 awx_image: awx
 redis_image: redis
 
