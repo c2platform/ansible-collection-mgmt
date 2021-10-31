@@ -25,6 +25,7 @@ backup_roles_supported:
   - myapp
   - awx
   - guacamole
+  - keycloak
 
 backup_roles:
   sonarqube:
@@ -56,6 +57,9 @@ backup_roles:
   guacamole:
     stop_start_containers: ['guacamole','guacd']
     keep: { daily: 3, weekly: 1, monthly: 0, manual: 1 }
+  keycloak:
+    stop_start_service: keycloak
+    keep: { daily: 3, weekly: 2, monthly: 0, manual: 1 }
   myapp:
     stop_start_service: myapp
     keep: { daily: 3, weekly: 2, monthly: 1, manual: 0 }
