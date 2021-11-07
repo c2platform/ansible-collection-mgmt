@@ -232,28 +232,31 @@ def restore_facts(data, restore_info, ptrn):
 
 def main():
 
-  fields = {
-    "backup_name_underscored": {"required": True, "type": "str"},
-    "backup_archives": {"required": True, "type": "str"},
-    "backup_snapshots": {"required": True, "type": "str"},
-    "backup_rsnapshot_id_file": {"required": True, "type": "str"},
-    "backup_rsnapshot_backup_db_folder": {"required": True, "type": "str"},
-    "role": {"required": True, "type": "str"},
-    "path_pattern": {"required": True, "type": "str"},
-    "force": {"default": False, "type": "bool"},
-    "folder": { "required": False, "type": "str"},
-    "remove_folder": { "required": False, "type": "str"},
-    "database": { "required": True, "type": "bool"},
-    "database_type": { "required": True, "type": "str"},
-    "home_version": { "required": True, "type": "str"},
-    "home_backup_version": { "required": True, "type": "str"},
-    "incremental": { "required": False, "type": "bool"},
-    "home": { "required": True, "type": "str"},
-    "tmp": {"required": True, "type": "str"}}
+    fields = {
+        "backup_name_underscored": {"required": True, "type": "str"},
+        "backup_archives": {"required": True, "type": "str"},
+        "backup_snapshots": {"required": True, "type": "str"},
+        "backup_rsnapshot_id_file": {"required": True, "type": "str"},
+        "backup_rsnapshot_backup_db_folder": {"required": True, "type": "str"},
+        "role": {"required": True, "type": "str"},
+        "path_pattern": {"required": True, "type": "str"},
+        "force": {"default": False, "type": "bool"},
+        "folder": {"required": False, "type": "str"},
+        "remove_folder": {"required": False, "type": "str"},
+        "database": {"required": True, "type": "bool"},
+        "database_type": {"required": True, "type": "str"},
+        "home_version": {"required": True, "type": "str"},
+        "home_backup_version": {"required": True, "type": "str"},
+        "incremental": {"required": False, "type": "bool"},
+        "home": {"required": True, "type": "str"},
+        "tmp": {"required": True, "type": "str"}}
 
-  module = AnsibleModule(argument_spec=fields)
-  has_changed, fcts, tr = get_restore_info(module.params)
-  module.exit_json(changed=has_changed, ansible_facts=fcts, msg=tr)
+    module = AnsibleModule(
+        argument_spec=fields,
+        supports_check_mode=True)
+    has_changed, fcts, tr = get_restore_info(module.params)
+    module.exit_json(changed=has_changed, ansible_facts=fcts, msg=tr)
+
 
 if __name__ == '__main__':
     main()

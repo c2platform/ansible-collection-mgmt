@@ -13,14 +13,14 @@
   file:
     path: "{{ backup_restore[item]['tmp'] }}"
     state: directory
-    mode: 0700
+    mode: 0755
   with_items: '{{ backup_restore }}'
 
 - name: Tmp restore home folders
   file:
     path: "{{  backup_restore[item]['tmp'] }}/home"
     state: directory
-    mode: 0700
+    mode: 0755
   when: backup_restore[item]['home_tar'] is defined
   with_items: '{{ backup_restore }}'
 
@@ -68,7 +68,7 @@
 
 - name: Provision role after restore
   include_role:
-    name: "{{ restore_role }}"
+    name: "{{ backup_restore[restore_role]['role_after_restore']|default(restore_role) }}"
   with_items: '{{ backup_restore }}'
   loop_control:
     loop_var: restore_role
