@@ -109,11 +109,6 @@
       register: db_restore
       #failed_when: "'ERROR' in db_restore.stderr"
 
-    - copy: # debug
-        content: "{{ {'db_restore': db_restore }|to_nice_yaml }}"
-        dest: /vagrant/db_restore.yml
-      become_user: root
-
   when: backup_restore[item]['delegate_db'] is defined
   delegate_to: "{{ backup_restore[item]['delegate_db'] }}"
   # delegate_facts: true
