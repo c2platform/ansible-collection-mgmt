@@ -171,7 +171,10 @@ def restore_facts_snapshots(data, restore_info, ptrn):
             "restored-file": restored_file(data)
           }}}
   if data['home_version']:
-      fcts['backup_restore_home'] = True
+      if 'backup_restore_home' in data:
+          fcts['backup_restore_home'] = data['backup_restore_home']
+      else:
+          fcts['backup_restore_home'] = True
       fcts['backup_restore'][data['role']]['rsync-target'] = data['home_version'] + '/'
       fcts['backup_restore'][data['role']]['rsync-src'] = restore_info[0]['path'] + '/home/'
       if data['folder']:
@@ -215,7 +218,10 @@ def restore_facts(data, restore_info, ptrn):
             "restored-file": restored_file(data)
           }}}
   if data['home_version']:
-    fcts['backup_restore_home'] = True
+    if 'backup_restore_home' in data:
+        fcts['backup_restore_home'] = data['backup_restore_home']
+    else:
+        fcts['backup_restore_home'] = True
     fcts['backup_restore'][data['role']]['rsync-target'] = data['home_version'] + '/'
     fcts['backup_restore'][data['role']]['rsync-src'] = hm_extracted + '/'
     if data['folder']:
@@ -238,6 +244,7 @@ def main():
         "backup_snapshots": {"required": True, "type": "str"},
         "backup_rsnapshot_id_file": {"required": True, "type": "str"},
         "backup_rsnapshot_backup_db_folder": {"required": True, "type": "str"},
+        "backup_restore_home": {"required": False, "type": "bool"},
         "role": {"required": True, "type": "str"},
         "path_pattern": {"required": True, "type": "str"},
         "force": {"default": False, "type": "bool"},

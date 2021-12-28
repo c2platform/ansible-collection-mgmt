@@ -94,6 +94,7 @@
     backup_rsnapshot_id_file: "{{ backup_rsnapshot_id_file }}"
     backup_rsnapshot_backup_db_folder: "{{ backup_rsnapshot_backup_db_folder }}"
     backup_name_underscored: "{{ item|c2platform.mgmt.backup_name_underscored(vars) }}" # no schedule
+    backup_restore_home: "{{ backup_restore_home|default(omit) }}"
   with_items: "{{ backup_restore }}"
   when: backup_restore is defined
 
