@@ -8,7 +8,7 @@ backup_split_into_chunks_of: 1000000
 backup_alias_prefix: c2
 backup_cron_jobs: true
 backup_restore_db: false
-backup_restore_home: false
+backup_restore_home: true
 backup_restore_confirm: true
 backup_lvm_snapshot_size: 1G
 backup_rsnapshot_id_file: .backup-id
