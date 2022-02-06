@@ -1,28 +1,36 @@
 #!/usr/bin/python
 
 from ansible.module_utils.basic import *
-import glob, os, hashlib, uuid
+import glob
+import os
+import hashlib
+# import uuid
+
 
 # Get checksum of backup tar file
 def tar_sha256sum(tar):
-  tsf = tar_sha256sum_file(tar)
-  if not os.path.isfile(tsf):
-    sha256_hash = hashlib.sha256()
-    with open(tar,"rb") as f:
-      for byte_block in iter(lambda: f.read(4096),b""):
-          sha256_hash.update(byte_block)
-    open(tsf,'w').write(sha256_hash.hexdigest())
-  return open(tsf, 'r').read()
+    tsf = tar_sha256sum_file(tar)
+    if not os.path.isfile(tsf):
+        sha256_hash = hashlib.sha256()
+        with open(tar, "rb") as f:
+            for byte_block in iter(lambda: f.read(4096), b""):
+                sha256_hash.update(byte_block)
+        open(tsf, 'w').write(sha256_hash.hexdigest())
+    return open(tsf, 'r').read()
+
 
 # Get id of the snapshot backup
 # The snapshot id is created in the before hook e.g. /etc/backup/hooks/myapp.sh
 def snapshot_id(ss, data):
-  sid_file = snapshot_id_file(ss, data)
-  return open(sid_file, 'r').read().rstrip()
+    sid_file = snapshot_id_file(ss, data)
+    return open(sid_file, 'r').read().rstrip()
 
-# Path of file with checksum for tar /backup/archives/myapp/myapp_daily_0_1_0/2020.07.15.10.54.02/
+
+# Path of file with checksum for tar
+# /backup/archives/myapp/myapp_daily_0_1_0/2020.07.15.10.54.02/
 def tar_sha256sum_file(tar):
-  return tar + '.sha256sum'
+    return tar + '.sha256sum'
+
 
 # e.g. /backup/snapshots/myapp/myapp-0.1.0/alpha.0/.backup-id
 # this file is created by the hooks file e.g. /etc/backup/hooks/myapp.sh

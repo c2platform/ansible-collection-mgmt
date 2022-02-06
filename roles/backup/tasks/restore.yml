@@ -70,5 +70,6 @@
   include_role:
     name: "{{ backup_restore[restore_role]['role_after_restore']|default(restore_role) }}"
   with_items: '{{ backup_restore }}'
+  when: backup_restore[restore_role]['role_after_restore']|default(True)
   loop_control:
     loop_var: restore_role
