@@ -114,3 +114,4 @@
   when:
     - backup_restore is defined
     - ( backup_restore_home or backup_restore_db )
+    - not backup_restore_dry_run|default(False)
