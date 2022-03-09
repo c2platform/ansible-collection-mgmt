@@ -8,7 +8,7 @@ backup_split_into_chunks_of: 1000000
 backup_alias_prefix: c2
 backup_cron_jobs: true
 backup_restore_db: false
-backup_restore_home: false
+backup_restore_home: true
 backup_restore_confirm: true
 backup_lvm_snapshot_size: 1G
 backup_rsnapshot_id_file: .backup-id
@@ -25,6 +25,8 @@ backup_roles_supported:
   - myapp
   - awx
   - guacamole
+  - keycloak
+  - nextcloud
 
 backup_roles:
   sonarqube:
@@ -56,6 +58,14 @@ backup_roles:
   guacamole:
     stop_start_containers: ['guacamole','guacd']
     keep: { daily: 3, weekly: 1, monthly: 0, manual: 1 }
+  keycloak:
+    stop_start_service: keycloak
+    keep: { daily: 3, weekly: 2, monthly: 0, manual: 1 }
+  nextcloud:
+    stop_start_service: apache2
+    keep: { daily: 0, weekly: 1, monthly: 0, manual: 1 }
+    # snapshot: yes
+    # incremental: yes
   myapp:
     stop_start_service: myapp
     keep: { daily: 3, weekly: 2, monthly: 1, manual: 0 }

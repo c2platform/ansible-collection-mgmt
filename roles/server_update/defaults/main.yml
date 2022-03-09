@@ -1,0 +1,8 @@
+---
+server_update_debug: no
+server_update_update_enabled: true
+server_update_reboot_enabled: true
+server_update_reboot_pre_delay: 0
+server_update_reboot_post_delay: 10
+server_update_reboot_timeout: 600
+server_update_proxy_environment: {}

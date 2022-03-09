@@ -1,0 +1,16 @@
+---
+- name: Upgrade all packages
+  apt:
+    state: latest # noqa 403
+    upgrade: dist
+    update_cache: yes
+  environment: "{{ server_update_proxy_environment }}"
+  register: server_update_results
+
+- name: Check reboot
+  stat:
+    path: /var/run/reboot-required
+  register: _reboot
+
+- set_fact:
+    server_update_reboot: "{{ _reboot.stat.exists }}"

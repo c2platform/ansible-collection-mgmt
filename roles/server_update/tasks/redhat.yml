@@ -1,0 +1,31 @@
+---
+- block:
+  - name: Server update
+    yum:
+      name: "*"
+      state: latest # noqa 10
+      update_cache: yes
+    environment: "{{ server_update_proxy_environment }}"
+    register: server_update_results
+    until: "server_update_results is success"
+    retries: 2
+    delay: 30
+  rescue:
+  - meta: flush_handlers
+  - fail:
+      msg: Upgrade failed
+
+- name: Check reboot
+  shell: LAST_KERNEL=$(rpm -q --last kernel | awk 'NR==1{sub(/kernel-/,""); print $1}'); CURRENT_KERNEL=$(uname -r); if [ $LAST_KERNEL != $CURRENT_KERNEL ]; then echo 'reboot'; else echo 'no'; fi # noqa 204 306
+  changed_when: false
+  register: _reboot
+
+- name: set_fact for reboot
+  set_fact:
+    server_update_reboot: "{{ _reboot.stdout.find('reboot') != -1 }}"
+
+- debug:
+    msg: "server_update_reboot: {{ server_update_reboot }}"
+
+- debug:
+    msg: "_reboot: {{ _reboot }}"

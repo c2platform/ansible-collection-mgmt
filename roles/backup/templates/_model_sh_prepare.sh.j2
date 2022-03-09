@@ -22,10 +22,10 @@
       ( vars[item + '_database_type']|default('postgresql') == 'oracle' or
        backup_roles[item]['incremental']|default(None) == True ) %}
   # Create a dump directory
-  if [ -d "{{ item|c2platform.platform.role_dump_dir(vars) }}" ]; then
+  if [ -d "{{ item|c2platform.mgmt.role_dump_dir(vars) }}" ]; then
     yell "Removing old dump directory"
-    try rm -rf {{ item|c2platform.platform.role_dump_dir(vars) }}
+    try rm -rf {{ item|c2platform.mgmt.role_dump_dir(vars) }}
   fi
-  try mkdir --parents {{ item|c2platform.platform.role_dump_dir(vars) }}
-  try chmod 0777 {{ item|c2platform.platform.role_dump_dir(vars) }}
+  try mkdir --parents {{ item|c2platform.mgmt.role_dump_dir(vars) }}
+  try chmod 0777 {{ item|c2platform.mgmt.role_dump_dir(vars) }}
 {% endif %}

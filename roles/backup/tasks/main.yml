@@ -76,12 +76,12 @@
     - rsnapshot
 
 - name: Restore facts
-  c2platform.platform.restore_info:
-    backup_archives: '{{ backup_archives }}'
-    backup_snapshots: '{{ backup_snapshots }}'
-    role: '{{ item }}'
-    path_pattern: '{{ backup_restore[item]["path_pattern"] }}'
-    force: '{{ backup_restore[item]["force"] }}'
+  c2platform.mgmt.restore_info:
+    backup_archives: "{{ backup_archives }}"
+    backup_snapshots: "{{ backup_snapshots }}"
+    role: "{{ item }}"
+    path_pattern: "{{ backup_restore[item]['path_pattern'] }}"
+    force: "{{ backup_restore[item]['force']|default(False) }}"
     database: "{{ vars[item+'_database_name'] is defined }}"
     database_type: "{{ vars[item+'_database_type']|default('postgresql') }}"
     home: "{{ vars[item + '_home'] }}"
@@ -89,12 +89,13 @@
     home_backup_version: "{{ vars[item+'_home_backup_version']|default(omit) }}"
     incremental: "{{ vars['backup_roles'][item]['incremental']|default(false) }}"
     tmp: "{{ backup_tmp }}/{{ inventory_hostname }}-{{ item }}"
-    folder: '{{ backup_restore[item]["folder"] }}'
-    remove_folder: '{{ backup_restore[item]["remove_folder"] | default(omit, true) }}'
-    backup_rsnapshot_id_file: '{{ backup_rsnapshot_id_file }}'
-    backup_rsnapshot_backup_db_folder: '{{ backup_rsnapshot_backup_db_folder }}'
-    backup_name_underscored: '{{ item|c2platform.platform.backup_name_underscored(vars) }}' # no schedule
-  with_items: '{{ backup_restore }}'
+    folder: "{{ backup_restore[item]['folder']|default('home') }}"
+    remove_folder: "{{ backup_restore[item]['remove_folder'] | default(omit, true) }}"
+    backup_rsnapshot_id_file: "{{ backup_rsnapshot_id_file }}"
+    backup_rsnapshot_backup_db_folder: "{{ backup_rsnapshot_backup_db_folder }}"
+    backup_name_underscored: "{{ item|c2platform.mgmt.backup_name_underscored(vars) }}" # no schedule
+    backup_restore_home: "{{ backup_restore_home|default(omit) }}"
+  with_items: "{{ backup_restore }}"
   when: backup_restore is defined
 
 - name: Backup restore facts
@@ -113,3 +114,4 @@
   when:
     - backup_restore is defined
     - ( backup_restore_home or backup_restore_db )
+    - not backup_restore_dry_run|default(False)
