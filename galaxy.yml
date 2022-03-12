@@ -2,7 +2,7 @@
 namespace: c2platform
 name: mgmt
 
-version: 1.0.0
+version: 0.1.0
 
 authors:
 - Onno van der Straaten (https://github.com/onknows)
