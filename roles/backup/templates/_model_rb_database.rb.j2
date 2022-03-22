@@ -1,4 +1,4 @@
-{% if vars[item + '_database_host'] is defined and
+{% if lookup('vars', item + '_database_host') is defined and
      backup_roles[item]['skip_database']|default(False) == False and
      vars[item + '_database_type']|default('postgresql') == 'postgresql' %}
   database PostgreSQL do |db|
@@ -9,13 +9,13 @@
 {%     endif %}
     db.username = '{{ vars[item + '_database_username'] }}'
     db.password = '{{ vars[item + '_database_password'] }}'
-    db.host = '{{ vars[item + '_database_host'] }}'
+    db.host = '{{ lookup('vars', item + '_database_host') }}'
     db.port = '{{ vars[item + '_database_port']|default('5432') }}'
     db.additional_options = []
   end
 {% endif %}
 
-{% if vars[item + '_database_host'] is defined and
+{% if lookup('vars', item + '_database_host') is defined and
      backup_roles[item]['skip_database']|default(False) == False and
      vars[item + '_database_type']|default('postgresql') == 'oracle' and
      backup_roles[item]['incremental']|default(False) == False %}

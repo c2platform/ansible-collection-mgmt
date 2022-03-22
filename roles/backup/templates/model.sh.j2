@@ -20,7 +20,7 @@ fi
 {% endif %}
 
 echo "Logging to {{ item|c2platform.mgmt.role_log_file_path(vars) }}"
-{% if vars[item + '_database_host'] is defined and
+{% if lookup('vars', item + '_database_host') is defined and
       backup_roles[item]['skip_database']|default(False) == False %}
 {# include _env_oracle.sh.j2 or _env_postgresql.sh.j2 (default) #}
 {% include './templates/_env_' + vars[item + '_database_type']|default('postgresql') + '.sh.j2' %}
@@ -41,7 +41,7 @@ then
 {%   include './templates/_model_sh_start.sh.j2' %}
 {% endif %}
 
-{% if vars[item + '_database_host'] is defined and
+{% if lookup('vars', item + '_database_host') is defined and
       backup_roles[item]['skip_database']|default(False) == False and
       vars[item + '_database_type']|default('postgresql') == 'oracle' %}
   # dump oracle database to {{ item|c2platform.mgmt.role_dump_dir(vars) }}

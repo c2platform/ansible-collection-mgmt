@@ -14,7 +14,7 @@
       postgresql_db:
         name: "{{ vars[item + '_database_name_version']  }}"
         maintenance_db: postgres
-        login_host: "{{ vars[item + '_database_host'] }}"
+        login_host: "{{ lookup('vars', item + '_database_host') }}"
         login_password: "{{ vars[item + '_database_admin_password'] }}"
         login_user: "{{ vars[item + '_database_admin_username'] }}"
         port:  "{{ vars[item + '_database_port'] }}"
@@ -30,7 +30,7 @@
         lc_ctype: "{{ vars[item + '_database_lc_ctype']|default('en_US.UTF-8') }}"
         encoding: "{{ vars[item + '_database_encoding']|default('UTF-8') }}"
         template: 'template0'
-        login_host: "{{ vars[item + '_database_host'] }}"
+        login_host: "{{ lookup('vars', item + '_database_host') }}"
         login_password: "{{ vars[item + '_database_admin_password'] }}"
         login_user: "{{ vars[item + '_database_admin_username'] }}"
         port:  "{{ vars[item + '_database_port'] }}"
@@ -52,7 +52,7 @@
     - name: Restore database
       postgresql_db:
         name: "{{ vars[item + '_database_name_version']  }}"
-        login_host: "{{ vars[item + '_database_host'] }}"
+        login_host: "{{ lookup('vars', item + '_database_host') }}"
         login_password: "{{ vars[item + '_database_admin_password'] }}"
         login_user: "{{ vars[item + '_database_admin_username'] }}"
         port: "{{ vars[item + '_database_port'] }}"
