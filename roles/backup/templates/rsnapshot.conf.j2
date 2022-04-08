@@ -18,7 +18,7 @@ backup	{{ vars[item + '_home_backup_version'] }}	home
 {% else %}
 backup	{{ vars[item + '_home_version'] }}	home
 {% endif %}
-{% if vars[item + '_database_host'] is defined %}
+{% if lookup('vars', item + '_database_host') is defined %}
 {%   if backup_roles[item]['skip_database']|default(False) == False %}
 backup	{{ item|c2platform.mgmt.role_dump_dir(vars) }}	database
 {%   endif %}

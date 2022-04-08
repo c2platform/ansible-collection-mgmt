@@ -35,7 +35,7 @@ GenericBackup.new(:{{ item|c2platform.mgmt.backup_name_underscored(vars,schdl) }
   end
 {% endif %}
 
-{% if vars[item + '_database_host'] is defined and
+{% if lookup('vars', item + '_database_host') is defined and
      backup_roles[item]['skip_database']|default(False) == False and
      vars[item + '_database_type']|default('postgresql') == 'postgresql' and
      backup_roles[item]['incremental']|default(False) == True %}
