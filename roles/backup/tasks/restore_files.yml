@@ -4,6 +4,7 @@
     src: "{{ backup_restore[backup_restore_item]['home_tar'] }}"
     remote_src: yes
     dest: "{{ backup_restore[backup_restore_item]['tmp'] }}/home"
+    extra_opts: "{{ backup_home_tar_unarchive_extra_opts|default(omit) }}"
   when: backup_restore[backup_restore_item]['home_tar'] is defined
 
 - name: Restore files

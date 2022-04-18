@@ -16,6 +16,9 @@ backup_rsnapshot_backup_db_folder: database
 backup_mount_options: ''
 #backup_script_before: ''
 
+backup_home_tar_unarchive_extra_opts:
+  - '--no-same-owner'
+
 backup_roles_supported:
   - jira
   - confluence
