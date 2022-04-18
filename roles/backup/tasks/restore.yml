@@ -11,65 +11,48 @@
 
 - name: Tmp restore folders
   file:
-    path: "{{ backup_restore[item]['tmp'] }}"
+    path: "{{ backup_restore[backup_restore_item]['tmp'] }}"
     state: directory
     mode: 0755
-  with_items: '{{ backup_restore }}'
 
 - name: Tmp restore home folders
   file:
-    path: "{{  backup_restore[item]['tmp'] }}/home"
+    path: "{{  backup_restore[backup_restore_item]['tmp'] }}/home"
     state: directory
     mode: 0755
-  when: backup_restore[item]['home_tar'] is defined
-  with_items: '{{ backup_restore }}'
+  when: backup_restore[backup_restore_item]['home_tar'] is defined
 
 - name: Extract tar
   unarchive:
-    src: "{{ backup_restore[item]['tar'] }}"
+    src: "{{ backup_restore[backup_restore_item]['tar'] }}"
     remote_src: yes
-    dest: "{{ backup_restore[item]['tmp'] }}"
-  when: backup_restore[item]['tar'] is defined
-  with_items: '{{ backup_restore }}'
+    dest: "{{ backup_restore[backup_restore_item]['tmp'] }}"
+  when: backup_restore[backup_restore_item]['tar'] is defined
 
 - name: Stop service
   service:
-    name: "{{ backup_restore[item]['stop_start_service'] }}"
+    name: "{{ backup_restore[backup_restore_item]['stop_start_service'] }}"
     state: stopped
   when:
-    backup_restore[item]['stop_start_service'] is defined
-  with_items: '{{ backup_restore }}'
+    backup_restore[backup_restore_item]['stop_start_service'] is defined
 
-- include_tasks: "restore_db_{{ vars[item + '_database_type']|default('postgresql') }}.yml"
-  when:
-    backup_restore_db
-  with_items: '{{ backup_restore }}'
+- include_tasks: "restore_db_{{ vars[backup_restore_item + '_database_type']|default('postgresql') }}.yml"
+  when: backup_restore[backup_restore_item]['backup_restore_db']
 
 - include_tasks: "restore_files.yml"
-  when:
-    backup_restore_home
+  when: backup_restore[backup_restore_item]['backup_restore_home']
 
 - name: Mark restore performed
   lineinfile:
-    dest: "{{ backup_restore[item]['restored-file'] }}"
-    line: "{{ backup_restore[item]['backup-id'] }}"
-  with_items: '{{ backup_restore }}'
-
-- name: Delete restore file
-  file:
-    path: "/tmp/RESTORE"
-    state: absent
+    dest: "{{ backup_restore[backup_restore_item]['restored-file'] }}"
+    line: "{{ backup_restore[backup_restore_item]['backup-id'] }}"
 
 - name: Delete tmp restore folders
   file:
-    path: "{{ backup_restore[item]['tmp'] }}"
+    path: "{{ backup_restore[backup_restore_item]['tmp'] }}"
     state: absent
-  with_items: '{{ backup_restore }}'
 
 - name: Provision role after restore
   include_role:
-    name: "{{ backup_restore[restore_role]['role_after_restore']|default(restore_role) }}"
-  with_items: '{{ backup_restore }}'
-  when: backup_restore[restore_role]['role_after_restore']|default(True)
-  loop_control:
-    loop_var: restore_role
+    name: "{{ backup_restore[backup_restore_item]['role_after_restore']|default(backup_restore_item) }}"
+  when: backup_restore[backup_restore_item]['role_after_restore']|default(True)

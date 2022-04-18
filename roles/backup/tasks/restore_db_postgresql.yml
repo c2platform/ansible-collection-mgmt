@@ -3,134 +3,134 @@
     - name: Terminate and block sessions on upgrade
       # a database cannot be dropped with active sessions
       include_role:
-        name: c2platform.tasks
-        tasks_from: psql-terminate-block-sessions
+        name: c2platform.core.postgresql_tasks
+        tasks_from: terminate-block-sessions
       vars:
-        terminate_database: "{{ vars[item + '_database_name_version']  }}"
-        lcm_role_upgrade: "{{ item }}"
-      when: backup_restore[item]['db_tar'] is defined
+        terminate_database: "{{ vars[backup_restore_item + '_database_name_version']  }}"
+        lcm_role_upgrade: "{{ backup_restore_item }}"
+      when: backup_restore[backup_restore_item]['db_tar'] is defined
 
     - name: Drop database
       postgresql_db:
-        name: "{{ vars[item + '_database_name_version']  }}"
+        name: "{{ vars[backup_restore_item + '_database_name_version']  }}"
         maintenance_db: postgres
-        login_host: "{{ lookup('vars', item + '_database_host') }}"
-        login_password: "{{ vars[item + '_database_admin_password'] }}"
-        login_user: "{{ vars[item + '_database_admin_username'] }}"
-        port:  "{{ vars[item + '_database_port'] }}"
+        login_host: "{{ lookup('vars', backup_restore_item + '_database_host') }}"
+        login_password: "{{ vars[backup_restore_item + '_database_admin_password'] }}"
+        login_user: "{{ vars[backup_restore_item + '_database_admin_username'] }}"
+        port:  "{{ vars[backup_restore_item + '_database_port'] }}"
         state: absent
       vars:
         ansible_ssh_pipelining: true
-      when: backup_restore[item]['db_tar'] is defined
+      when: backup_restore[backup_restore_item]['db_tar'] is defined
 
     - name: Create database
       postgresql_db:
-        name: "{{ vars[item + '_database_name_version']  }}"
-        lc_collate: "{{ vars[item + '_database_lc_collate']|default('en_US.UTF-8') }}"
-        lc_ctype: "{{ vars[item + '_database_lc_ctype']|default('en_US.UTF-8') }}"
-        encoding: "{{ vars[item + '_database_encoding']|default('UTF-8') }}"
+        name: "{{ vars[backup_restore_item + '_database_name_version']  }}"
+        lc_collate: "{{ vars[backup_restore_item + '_database_lc_collate']|default('en_US.UTF-8') }}"
+        lc_ctype: "{{ vars[backup_restore_item + '_database_lc_ctype']|default('en_US.UTF-8') }}"
+        encoding: "{{ vars[backup_restore_item + '_database_encoding']|default('UTF-8') }}"
         template: 'template0'
-        login_host: "{{ lookup('vars', item + '_database_host') }}"
-        login_password: "{{ vars[item + '_database_admin_password'] }}"
-        login_user: "{{ vars[item + '_database_admin_username'] }}"
-        port:  "{{ vars[item + '_database_port'] }}"
-        owner: "{{ vars[item + '_database_username'] }}"
+        login_host: "{{ lookup('vars', backup_restore_item + '_database_host') }}"
+        login_password: "{{ vars[backup_restore_item + '_database_admin_password'] }}"
+        login_user: "{{ vars[backup_restore_item + '_database_admin_username'] }}"
+        port:  "{{ vars[backup_restore_item + '_database_port'] }}"
+        owner: "{{ vars[backup_restore_item + '_database_username'] }}"
         state: present
       vars:
         ansible_ssh_pipelining: true
-      when: backup_restore[item]['db_tar'] is defined
+      when: backup_restore[backup_restore_item]['db_tar'] is defined
 
     - name: Allow sessions after database copy
       include_role:
-        name: c2platform.tasks
+        name: c2platform.core.postgresql_tasks
         tasks_from: psql-allow-sessions
       vars:
-        allow_database: "{{ vars[item + '_database_name_version']  }}"
-        lcm_role_upgrade: "{{ item }}"
-      when: backup_restore[item]['db_tar'] is defined
+        allow_database: "{{ vars[backup_restore_item + '_database_name_version']  }}"
+        lcm_role_upgrade: "{{ backup_restore_item }}"
+      when: backup_restore[backup_restore_item]['db_tar'] is defined
 
     - name: Restore database
       postgresql_db:
-        name: "{{ vars[item + '_database_name_version']  }}"
-        login_host: "{{ lookup('vars', item + '_database_host') }}"
-        login_password: "{{ vars[item + '_database_admin_password'] }}"
-        login_user: "{{ vars[item + '_database_admin_username'] }}"
-        port: "{{ vars[item + '_database_port'] }}"
+        name: "{{ vars[backup_restore_item + '_database_name_version']  }}"
+        login_host: "{{ lookup('vars', backup_restore_item + '_database_host') }}"
+        login_password: "{{ vars[backup_restore_item + '_database_admin_password'] }}"
+        login_user: "{{ vars[backup_restore_item + '_database_admin_username'] }}"
+        port: "{{ vars[backup_restore_item + '_database_port'] }}"
         state: restore
-        target: "{{ backup_restore[item]['db_tar'] }}"
+        target: "{{ backup_restore[backup_restore_item]['db_tar'] }}"
       vars:
         ansible_ssh_pipelining: true
-      when: backup_restore[item]['db_tar'] is defined
+      when: backup_restore[backup_restore_item]['db_tar'] is defined
       register: db_restore
       failed_when: "'ERROR' in db_restore.stderr"
-  when: not backup_restore[item]['delegate_db'] is defined
+  when: not backup_restore[backup_restore_item]['delegate_db'] is defined
 
 - block:
-    - name: Terminate and block sessions on upgrade
+    - name: Terminate and block sessions on upgrade ( delegated )
       # a database cannot be dropped with active sessions
       include_role:
         name: c2platform.core.postgresql_tasks
         tasks_from: terminate-block-sessions
       vars:
-        terminate_database: "{{ vars[item + '_database_name_version']  }}"
-        lcm_role_upgrade: "{{ item }}"
-      when: backup_restore[item]['db_tar'] is defined
+        terminate_database: "{{ vars[backup_restore_item + '_database_name_version']  }}"
+        lcm_role_upgrade: "{{ backup_restore_item }}"
+      when: backup_restore[backup_restore_item]['db_tar'] is defined
 
     - name: Drop database
       postgresql_db:
-        name: "{{ vars[item + '_database_name_version']  }}"
+        name: "{{ vars[backup_restore_item + '_database_name_version']  }}"
         maintenance_db: postgres
         state: absent
       vars:
         ansible_ssh_pipelining: true
-      when: backup_restore[item]['db_tar'] is defined
+      when: backup_restore[backup_restore_item]['db_tar'] is defined
 
     - name: Create database
       postgresql_db:
-        name: "{{ vars[item + '_database_name_version']  }}"
-        lc_collate: "{{ vars[item + '_database_lc_collate']|default('en_US.UTF-8') }}"
-        lc_ctype: "{{ vars[item + '_database_lc_ctype']|default('en_US.UTF-8') }}"
-        encoding: "{{ vars[item + '_database_encoding']|default('UTF-8') }}"
+        name: "{{ vars[backup_restore_item + '_database_name_version']  }}"
+        lc_collate: "{{ vars[backup_restore_item + '_database_lc_collate']|default('en_US.UTF-8') }}"
+        lc_ctype: "{{ vars[backup_restore_item + '_database_lc_ctype']|default('en_US.UTF-8') }}"
+        encoding: "{{ vars[backup_restore_item + '_database_encoding']|default('UTF-8') }}"
         template: 'template0'
-        owner: "{{ vars[item + '_database_username'] }}"
+        owner: "{{ vars[backup_restore_item + '_database_username'] }}"
         state: present
       vars:
         ansible_ssh_pipelining: true
-      when: backup_restore[item]['db_tar'] is defined
+      when: backup_restore[backup_restore_item]['db_tar'] is defined
 
     - name: Allow sessions after database copy
       include_role:
         name: c2platform.core.postgresql_tasks
         tasks_from: allow-sessions
       vars:
-        allow_database: "{{ vars[item + '_database_name_version']  }}"
-        lcm_role_upgrade: "{{ item }}"
-      when: backup_restore[item]['db_tar'] is defined
+        allow_database: "{{ vars[backup_restore_item + '_database_name_version']  }}"
+        lcm_role_upgrade: "{{ backup_restore_item }}"
+      when: backup_restore[backup_restore_item]['db_tar'] is defined
 
     - name: Copy to /tmp for postgres
       copy:
-        src: "{{ backup_restore[item]['db_tar'] }}"
-        dest:  "/tmp/{{ backup_restore[item]['db_tar']|basename }}"
+        src: "{{ backup_restore[backup_restore_item]['db_tar'] }}"
+        dest:  "/tmp/{{ backup_restore[backup_restore_item]['db_tar']|basename }}"
         remote_src: true
         owner: postgres
         group: postgres
       vars:
         ansible_ssh_pipelining: true
-      when: backup_restore[item]['db_tar'] is defined
+      when: backup_restore[backup_restore_item]['db_tar'] is defined
       become_user: root
 
     - name: Restore database
       postgresql_db:
-        name: "{{ vars[item + '_database_name_version']  }}"
+        name: "{{ vars[backup_restore_item + '_database_name_version']  }}"
         state: restore
-        #target: "{{ backup_restore[item]['db_tar'] }}"
-        target: "/tmp/{{ backup_restore[item]['db_tar']|basename }}"
+        #target: "{{ backup_restore[backup_restore_item]['db_tar'] }}"
+        target: "/tmp/{{ backup_restore[backup_restore_item]['db_tar']|basename }}"
       vars:
         ansible_ssh_pipelining: true
-      when: backup_restore[item]['db_tar'] is defined
+      when: backup_restore[backup_restore_item]['db_tar'] is defined
       register: db_restore
       #failed_when: "'ERROR' in db_restore.stderr"
-  when: backup_restore[item]['delegate_db'] is defined
-  delegate_to: "{{ backup_restore[item]['delegate_db'] }}"
+  when: backup_restore[backup_restore_item]['delegate_db'] is defined
+  delegate_to: "{{ backup_restore[backup_restore_item]['delegate_db'] }}"
   # delegate_facts: true
   become_user: postgres

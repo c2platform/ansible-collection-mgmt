@@ -95,23 +95,29 @@
     backup_rsnapshot_backup_db_folder: "{{ backup_rsnapshot_backup_db_folder }}"
     backup_name_underscored: "{{ item|c2platform.mgmt.backup_name_underscored(vars) }}" # no schedule
     backup_restore_home: "{{ backup_restore_home|default(omit) }}"
-  with_items: "{{ backup_restore }}"
+  with_items: "{{ backup_restore|intersect(ansible_role_names_cleaned) }}"
   when: backup_restore is defined
+  register: _whatever
 
-- name: Backup restore facts
-  debug:
-    var: backup_restore
-  when: backup_restore is defined
+- block:
+    - include_tasks: "restore.yml"
+      with_items: "{{ backup_restore|intersect(ansible_role_names_cleaned) }}"
+      loop_control:
+        loop_var: backup_restore_item
+      when: not backup_restore[backup_restore_item]['restored']
 
-- name: Backup restore facts additional
-  debug:
-    msg:
-      - "backup_restore_db: {{ backup_restore_db }}"
-      - "backup_restore_home: {{ backup_restore_home }}"
-  when: backup_restore is defined
+    - name: Delete restore file
+      file:
+        path: "/tmp/RESTORE"
+        state: absent
 
-- include_tasks: "restore.yml"
+    - name: Restored message
+      debug:
+        msg: Backup is already restored
+      with_items: "{{ backup_restore|intersect(ansible_role_names_cleaned) }}"
+      loop_control:
+        loop_var: backup_restore_item
+      when: backup_restore[backup_restore_item]['restored']
   when:
     - backup_restore is defined
-    - ( backup_restore_home or backup_restore_db )
     - not backup_restore_dry_run|default(False)

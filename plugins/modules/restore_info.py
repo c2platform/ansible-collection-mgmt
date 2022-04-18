@@ -150,15 +150,11 @@ def get_restore_info_tar(data):
     restore_info.append({"path":tr, "backup-id": s256, "restored": not not_restored(s256,data)})
   if len(restore_info) > 0 and (restore_info[0]["restored"] == False or data['force'] == True):
     has_changed = True
+  fcts = restore_facts(data, restore_info, ptrn)
+  fcts['backup_restore'][data['role']]['path_pattern_expanded'] = ptrn
+  fcts['backup_restore'][data['role']]['tars'] = restore_info
   if has_changed:
-    fcts = restore_facts(data, restore_info, ptrn)
     tr = restore_info[0]['path']
-  else:
-    fcts = { 'backup_restore':
-            {data['role']: {
-              "path_pattern_expanded": ptrn,
-              "tars": restore_info
-            }}}
   return (has_changed, fcts, tr)
 
 def get_restore_info(data):
@@ -180,9 +176,9 @@ def restore_facts_snapshots(data, restore_info, ptrn):
           }}}
   if data['home_version']:
       if 'backup_restore_home' in data:
-          fcts['backup_restore_home'] = data['backup_restore_home']
+          fcts['backup_restore'][data['role']]['backup_restore_home'] = data['backup_restore_home']
       else:
-          fcts['backup_restore_home'] = True
+          fcts['backup_restore'][data['role']]['backup_restore_home'] = True
       fcts['backup_restore'][data['role']]['rsync-target'] = data['home_version'] + '/'
       fcts['backup_restore'][data['role']]['rsync-src'] = restore_info[0]['path'] + '/home/'
       if data['folder']:
@@ -203,11 +199,14 @@ def restore_facts_snapshots(data, restore_info, ptrn):
           # e.g. tr is /backup/snapshots/myapp/myapp-0.1.0/alpha.0/database/myapp_weekly_0_1_0.tar
           fcts['backup_restore'][data['role']]['tar'] = tr
           fcts['backup_restore'][data['role']]['db_tar'] = db_tar(data['tmp'], tr, data['database_type'], True)
-          fcts['backup_restore_db'] = True
+          fcts['backup_restore'][data['role']]['backup_restore_db'] = True
       else:
-          fcts['backup_restore_db'] = False
+          fcts['backup_restore'][data['role']]['backup_restore_db'] = False
   if data['remove_folder']:
       fcts['backup_restore'][data['role']]['remove_folder_expanded'] = get_remove_folder(data)
+  fcts['backup_restore'][data['role']]['restored'] = False
+  if fcts['backup_restore'][data['role']]['snapshots'][0]['restored']:
+    fcts['backup_restore'][data['role']]['restored'] = True
   return fcts
 
 # Restore facts for tar files
@@ -227,9 +226,9 @@ def restore_facts(data, restore_info, ptrn):
           }}}
   if data['home_version']:
     if 'backup_restore_home' in data:
-        fcts['backup_restore_home'] = data['backup_restore_home']
+        fcts['backup_restore'][data['role']]['backup_restore_home'] = data['backup_restore_home']
     else:
-        fcts['backup_restore_home'] = True
+        fcts['backup_restore'][data['role']]['backup_restore_home'] = True
     fcts['backup_restore'][data['role']]['rsync-target'] = data['home_version'] + '/'
     fcts['backup_restore'][data['role']]['rsync-src'] = hm_extracted + '/'
     if data['folder']:
@@ -239,10 +238,14 @@ def restore_facts(data, restore_info, ptrn):
     fcts['backup_restore'][data['role']]['home_tar'] = home_tar(data['tmp'], restore_info[0]['path'])
   if data['database']:
     fcts['backup_restore'][data['role']]['db_tar'] = db_tar(data['tmp'], restore_info[0]['path'], data['database_type'])
-    fcts['backup_restore_db'] = True
+    fcts['backup_restore'][data['role']]['backup_restore_db'] = True
   if data['remove_folder']:
     fcts['backup_restore'][data['role']]['remove_folder_expanded'] = get_remove_folder(data)
+  fcts['backup_restore'][data['role']]['restored'] = False
+  if fcts['backup_restore'][data['role']]['tars'][0]['restored']:
+    fcts['backup_restore'][data['role']]['restored'] = True
   return fcts
+
 
 def main():
 
