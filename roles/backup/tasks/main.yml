@@ -97,7 +97,6 @@
     backup_restore_home: "{{ backup_restore_home|default(omit) }}"
   with_items: "{{ backup_restore|intersect(ansible_role_names_cleaned) }}"
   when: backup_restore is defined
-  register: _whatever
 
 - name: Restore facts to /tmp/backup_restore.yml
   copy:
