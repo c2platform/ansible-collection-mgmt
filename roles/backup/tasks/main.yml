@@ -103,6 +103,7 @@
   copy:
     content: "{{ {'backup_restore': backup_restore }|to_nice_yaml }}"
     dest: /tmp/backup_restore.yml
+  when: backup_restore is defined
 
 - block:
     - include_tasks: "restore.yml"
