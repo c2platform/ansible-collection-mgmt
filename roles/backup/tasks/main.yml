@@ -99,6 +99,11 @@
   when: backup_restore is defined
   register: _whatever
 
+- name: Restore facts to /tmp/backup_restore.yml
+  copy:
+    content: "{{ {'backup_restore': backup_restore }|to_nice_yaml }}"
+    dest: /tmp/backup_restore.yml
+
 - block:
     - include_tasks: "restore.yml"
       with_items: "{{ backup_restore|intersect(ansible_role_names_cleaned) }}"
