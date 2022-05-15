@@ -11,6 +11,10 @@
   command: "rsync -az --delete --recursive {{ backup_restore[backup_restore_item]['rsync-src'] }} {{ backup_restore[backup_restore_item]['rsync-target'] }}"
   when: backup_restore[backup_restore_item]['home_tar'] is defined or backup_roles[backup_restore_item]['incremental']
 
+- name: Chown
+  command: "chown {{ backup_restore[backup_restore_item]['chown'] }} {{ backup_restore[backup_restore_item]['rsync-target'] }} -R"
+  when: ( backup_restore[backup_restore_item]['home_tar'] is defined or backup_roles[backup_restore_item]['incremental'] ) and backup_restore[backup_restore_item]['chown'] is defined
+
 - name: Delete folders
   file:
     state: absent
